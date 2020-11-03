@@ -134,7 +134,7 @@ const frtchTableData =(option:{})=>{
             data: fetchData || [],            
 
         },
-        useFlexLayout, 
+        useFlexLayout, useSortBy
     )
     return(
     <div>

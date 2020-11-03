@@ -27,6 +27,7 @@ export interface BasicTable<D extends object> extends TableInstance<D> {
     sortTableBy?:any
     filterTable?:any
     name?:any
+    getSortByToggleProps():any
     onClick() : void
     
     
@@ -137,66 +138,51 @@ export const BasicTable = ({
                         ></TableBody>
                     </Table>
                     <LoadingTable /></>}
-        {!loading && <Table {...getTableProps(getCustomTableProps())}>
-                    <TableHead className={classes.tableHead}>
-                        {headerGroups.map((headerGroup, i) => (
-                            <TableRow
-                                {...headerGroup.getHeaderGroupProps(
-                                    getCustomHeaderGroupProps(headerGroup, i)
-                                )}
-                            >
-                                {headerGroup.headers.map((column, item) => (
-                                    <TableCell
-                                        {...column.getHeaderProps(
-                                            getCustomHeaderProps(column, item)
-                                        )}
-                                        classes={{ root: column.className }}                                    
-                                          // @ts-ignore
-                                        // tslint:disable-next-line:jsx-no-lambda
-                                        onClick={(e)=>{handleSortTable(e,column.id)}}
-                                   
-                                    >
-                                        {column.render('Header')}
-                                        {column.id === sortBy && "↓"}
-                                        
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHead>
-                    <TableBody
-                        {...getTableBodyProps(getCustomTableBodyProps())}
-                    >
-                        {rows.map((row, idx) => {
-                            prepareRow(row)
-                            return (
-                                <TableRow 
-                                    {...row.getRowProps(
-                                        getCustomRowProps(row, idx)
-                                    )}
-                                >
-                                    {row.cells.map((cell, index) => {
-                                        return (
-                                            // tslint:disable-next-line:jsx-key
-                                            <TableCell 
-                                                padding="none"
-                                                {...cell.getCellProps(
-                                                    getCustomCellProps(
-                                                        cell,
-                                                        index,
-                                                        row
-                                                    )
-                                                )}
-                                            >
-                                                {cell.render('Cell')}
-                                            </TableCell>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>}
+        {!loading && <Table {...getTableProps()}>
+        <TableHead className={classes.tableHead}>
+          {headerGroups.map(headerGroup => (
+            <TableRow {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                
+                // @ts-ignore
+                <TableCell {...column.getHeaderProps(column.getSortByToggleProps())}
+                classes={{ root: column.className }}
+                >
+                  {column.render('Header')}
+                  {/* Add a sort direction indicator */}
+                  <span>
+                    {
+                        // @ts-ignore
+                    column.isSorted
+                     // @ts-ignore
+                      ? column.isSortedDesc
+                        ? ' 🔽'
+                        : ' 🔼'
+                      : ''}
+                  </span>
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableHead>
+        <TableBody {...getTableBodyProps()}>
+          {rows.map(
+            (row, i) => {
+              prepareRow(row);
+              return (
+                // tslint:disable-next-line:jsx-key
+                <TableRow {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      // tslint:disable-next-line:jsx-key
+                      <TableCell  {...cell.getCellProps()}>{cell.render('Cell')}</TableCell >
+                    )
+                  })}
+                </TableRow>
+              )}
+          )}
+        </TableBody>
+      </Table>}
                 
                 {rows.length === 0 && <EmptyTableText />}
                
